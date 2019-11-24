@@ -9,9 +9,8 @@ import pandas as pd
 import os
 from lib import tweets_dataSet_lib as tl
 
-N = 5 # maximum number of connections
+N = 5 # max connect number
 
-# send of the file
 def send_file(sock, df):
 	msg = pickle.dumps(df)
 	size = len(msg)
@@ -20,8 +19,7 @@ def send_file(sock, df):
 	sock.recv(1024)
 	sock.send(msg)
 	sock.recv(1024)
-	
-# This function collects statistics and sends tables to the client	
+
 def stat(self, size):
 	self.send("STAT".encode("utf-8"))
 	sizeof = int(size)
@@ -56,7 +54,6 @@ def stat(self, size):
 	df_retweets.to_csv(index=False)
 	send_file(self, df_retweets)
 
-# This function applies the NER algorithm and sends the table to the client
 def enti(self, size):
 	self.send("ENTI".encode("utf-8"))
 	sizeof = int(size)
@@ -73,8 +70,7 @@ def enti(self, size):
 	df = pd.DataFrame(tl.NLP(data_arr))
 	df.to_csv(index=False)
 	send_file(self, df)
-	
-# This function analyzes the query mode and starts the required function
+
 def handler(conn):
 	data = conn.recv(1024)
 	if not data:	
@@ -86,13 +82,13 @@ def handler(conn):
 		enti(conn, size)
 	conn.close()
 
-if __name__ == '__main__':
-	sock = socket.socket()
-	sock.bind(('', 9081))
-	sock.listen(N)
-	while True:
-		conn, addr = sock.accept()
-		print('connected:', addr)
-		p = Process(target=handler, args=(conn,))
-		p.start()
-	sock.close()
+
+sock = socket.socket()
+sock.bind(('', 9081))
+sock.listen(N)
+while True:
+	conn, addr = sock.accept()
+	print('connected:', addr)
+	p = Process(target=handler, args=(conn,))
+	p.start()
+sock.close()

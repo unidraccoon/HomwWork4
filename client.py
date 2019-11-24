@@ -5,7 +5,6 @@ import os
 import pickle
 import time
 
-# this function returns the DataFrame of the first number of tweets from the entered file
 def crop_file(file, number):
 	new_file = {}
 	for rows in file:
@@ -18,7 +17,6 @@ def crop_file(file, number):
 				break
 	return(pd.DataFrame(new_file))
 
-# presentation of results
 output_dir = r'result/'
 f_words = output_dir + r"top_words.csv"
 f_authors = output_dir + r"popular_authors.csv"
@@ -28,7 +26,6 @@ f_country_retweets = output_dir + r"top_country_retweets.csv"
 list_of_files = [f_words, f_tweets, f_authors, f_country_tweets, f_country_retweets]
 f_nlp = output_dir + r"nlp_result.csv"
 
-# getting the result from the server
 def recv_file(sock):
 	data = sock.recv(1024)
 	size = data.decode("utf-8")
@@ -47,9 +44,7 @@ def recv_file(sock):
 	sock.send("end".encode('utf-8'))
 	return data_arr
 
-# input and verification of the correctness of initial 
-# information: file name for analysis and mode 
-print("Enter filename: ", end='')
+print("Filename: ", end='')
 filename = input()
 if filename.rfind('.csv') == -1:
 	print('Error: Invalid file format')
@@ -67,7 +62,6 @@ if  mode != 'stat' and mode != 'enti':
 print("Enter number of tweets: ", end='')
 number = int(input())
 
-# sending a file to the server
 sock = socket.socket()
 sock.connect(('localhost', 9081))
 msg = pickle.dumps(crop_file(file, number))
@@ -77,7 +71,6 @@ sock.send(inf.encode('utf-8'))
 data = sock.recv(1024)
 sock.send(msg)
 
-# reception of results. The result is represented by a files in output_dir: 
 if not os.path.exists(output_dir):
 	os.makedirs(output_dir)
 if mode.upper() == "STAT":
